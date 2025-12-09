@@ -2,7 +2,7 @@
 //Date: 10-23-2025
 //Description: Arrgh! 'Tis be me pirate game
 //Goal: Keep improving the game until it reaches 268 lines of code
-//Notes: Start from page 30 to implement high scores
+//Notes: Finished all the coding suggestions on pg 129
 
 package main
 
@@ -13,11 +13,17 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-// global variable
-var gameOver bool = false
-var score int = 0
-var numberOfUpdates = 0
-var windowXSize int32 = 800
+// the book's example made these global variables, for best practice I will make them a struct
+type GameState struct {
+	GameOver        bool
+	Score           int
+	NumberOfUpdates int
+	WindowXSize     int32
+}
+
+func newGameState() *GameState {
+	return &GameState{GameOver: false, Score: 0, NumberOfUpdates: 0, WindowXSize: 800}
+}
 
 type Actor struct {
 	Texture rl.Texture2D
@@ -32,29 +38,29 @@ func newActor(texture rl.Texture2D, x, y float32) *Actor {
 
 // This function resets the object back to the beginning.
 // The beginning being right side off screen
-func placeIt() float32 {
-	return float32(int32(rand.IntN(int(windowXSize))) + windowXSize)
+func placeIt(yourGame *GameState) float32 {
+	return float32(int32(rand.IntN(int(yourGame.WindowXSize))) + yourGame.WindowXSize)
 }
 
-func draw(balloon, bird, house, tree *Actor, background rl.Texture2D) {
+func draw(balloon, bird, house, tree *Actor, background rl.Texture2D, yourGame *GameState) {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	rl.DrawTexture(background, 0, 0, rl.White)
-	if gameOver == false {
+	if yourGame.GameOver == false {
 		rl.DrawTexture(balloon.Texture, int32(balloon.X), int32(balloon.Y), rl.White)
 		rl.DrawTexture(bird.Texture, int32(bird.X), int32(bird.Y), rl.White)
 		rl.DrawTexture(house.Texture, int32(house.X), int32(house.Y), rl.White)
 		rl.DrawTexture(tree.Texture, int32(tree.X), int32(tree.Y), rl.White)
-		rl.DrawText(strconv.Itoa(score), 10, 10, 24, rl.LightGray)
+		rl.DrawText(strconv.Itoa(yourGame.Score), 10, 10, 24, rl.LightGray)
 	} else {
 		displayHighScore()
 	}
 	rl.EndDrawing()
 }
 
-func update(balloon, house, tree, bird *Actor, birdTextures *[2]rl.Texture2D) {
+func update(balloon, house, tree, bird *Actor, birdTextures *[2]rl.Texture2D, yourGame *GameState) {
 	noHold := true
-	if gameOver == false {
+	if yourGame.GameOver == false {
 		//here we are doing the game controls
 		if rl.IsKeyPressed(rl.KeyUp) && noHold {
 			balloon.Y -= 43 //remember, up is down because the game engine's position layout
@@ -72,43 +78,48 @@ func update(balloon, house, tree, bird *Actor, birdTextures *[2]rl.Texture2D) {
 		if house.X > -60 {
 			house.X = house.X - 2
 		} else {
-			house.X = placeIt()
-			score += 1
+			house.X = placeIt(yourGame)
+			yourGame.Score += 1
 		}
 		if tree.X > -80 {
 			tree.X = tree.X - 2
 		} else {
-			tree.X = placeIt()
-			score += 1
+			tree.X = placeIt(yourGame)
+			yourGame.Score += 1
 		}
 		//bird logic
 		if bird.X > -10 {
 			bird.X -= 4
-			if numberOfUpdates == 9 {
+			if yourGame.NumberOfUpdates == 9 {
 				bird = flap(bird, birdTextures)
-				numberOfUpdates = 0
+				yourGame.NumberOfUpdates = 0
 			} else {
-				numberOfUpdates += 1
+				yourGame.NumberOfUpdates += 1
 			}
 		} else {
 			//this is else if the bird already past the balloon
-			bird.X = placeIt()
+			bird.X = placeIt(yourGame)
 			bird.Y = float32(rand.IntN(200)) + 10
-			score += 1
-			numberOfUpdates = 0
+			yourGame.Score += 1
+			yourGame.NumberOfUpdates = 0
 		}
 		//collision with the window
-		balloon.X = rl.Clamp(balloon.X, 0.0, float32(windowXSize)-balloon.Width)
+		balloon.X = rl.Clamp(balloon.X, 0.0, float32(yourGame.WindowXSize)-balloon.Width)
 		balloon.Y = rl.Clamp(balloon.Y, 0.0, float32(600)-balloon.Height)
 
 		//handle collisions with obstacles
 		if rl.CheckCollisionRecs(balloon.Rectangle, bird.Rectangle) ||
 			rl.CheckCollisionRecs(balloon.Rectangle, house.Rectangle) ||
 			rl.CheckCollisionRecs(balloon.Rectangle, tree.Rectangle) {
-			gameOver = true
+			yourGame.GameOver = true
 		}
 
 	}
+}
+
+// from step 9 & 20
+func updateHighScore() {
+
 }
 
 func displayHighScore() {
@@ -125,8 +136,10 @@ func flap(bird *Actor, textures *[2]rl.Texture2D) *Actor {
 }
 
 func main() {
+	//creating the game
+	yourGame := newGameState()
 	//creating our window
-	rl.InitWindow(windowXSize, 600, "Sky Pirates!")
+	rl.InitWindow(yourGame.WindowXSize, 600, "Sky Pirates!")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
@@ -144,20 +157,20 @@ func main() {
 
 	houseTexture := rl.LoadTexture("images/house.png")
 	defer rl.UnloadTexture(houseTexture)
-	house := newActor(houseTexture, placeIt(), 450)
+	house := newActor(houseTexture, placeIt(yourGame), 450)
 
 	treeTexture := rl.LoadTexture("images/tree.png")
 	defer rl.UnloadTexture(treeTexture)
-	tree := newActor(treeTexture, placeIt(), 400)
+	tree := newActor(treeTexture, placeIt(yourGame), 400)
 
 	background := rl.LoadTexture("images/background.png")
 	defer rl.UnloadTexture(background)
 
-	balloon.X = rl.Clamp(balloon.X, 0.0, float32(windowXSize)-balloon.Width)
+	balloon.X = rl.Clamp(balloon.X, 0.0, float32(yourGame.WindowXSize)-balloon.Width)
 	balloon.Y = rl.Clamp(balloon.Y, 0.0, float32(600)-balloon.Height)
 
 	for !rl.WindowShouldClose() {
-		draw(balloon, bird, house, tree, background)
-		update(balloon, house, tree, bird, &birdTextures)
+		draw(balloon, bird, house, tree, background, yourGame)
+		update(balloon, house, tree, bird, &birdTextures, yourGame)
 	}
 }
