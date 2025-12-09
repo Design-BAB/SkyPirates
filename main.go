@@ -2,8 +2,7 @@
 //Date: 10-23-2025
 //Description: Arrgh! 'Tis be me pirate game
 //Goal: Keep improving the game until it reaches 268 lines of code
-//Notes: Finished all the coding suggestions on pg 128
-//		 The next thing to work on is pg 129 step 23
+//Notes: Start from page 30 to implement high scores
 
 package main
 
@@ -61,18 +60,22 @@ func update(balloon, house, tree, bird *Actor, birdTextures *[2]rl.Texture2D) {
 			balloon.Y -= 43 //remember, up is down because the game engine's position layout
 			noHold = false
 		} else {
-			balloon.Y += 1
+			balloon.Y += .5
+		}
+
+		if rl.IsKeyPressed(rl.KeyDown) {
+			balloon.Y += 32
 		}
 
 		//Coding Games in Py the book does bird first, but since it is the most complicated
 		//I decided to put it towards the bottom of the function
-		if house.X > -10 {
+		if house.X > -60 {
 			house.X = house.X - 2
 		} else {
 			house.X = placeIt()
 			score += 1
 		}
-		if tree.X > -10 {
+		if tree.X > -80 {
 			tree.X = tree.X - 2
 		} else {
 			tree.X = placeIt()
@@ -97,6 +100,14 @@ func update(balloon, house, tree, bird *Actor, birdTextures *[2]rl.Texture2D) {
 		//collision with the window
 		balloon.X = rl.Clamp(balloon.X, 0.0, float32(windowXSize)-balloon.Width)
 		balloon.Y = rl.Clamp(balloon.Y, 0.0, float32(600)-balloon.Height)
+
+		//handle collisions with obstacles
+		if rl.CheckCollisionRecs(balloon.Rectangle, bird.Rectangle) ||
+			rl.CheckCollisionRecs(balloon.Rectangle, house.Rectangle) ||
+			rl.CheckCollisionRecs(balloon.Rectangle, tree.Rectangle) {
+			gameOver = true
+		}
+
 	}
 }
 
@@ -133,7 +144,7 @@ func main() {
 
 	houseTexture := rl.LoadTexture("images/house.png")
 	defer rl.UnloadTexture(houseTexture)
-	house := newActor(houseTexture, placeIt(), 400)
+	house := newActor(houseTexture, placeIt(), 450)
 
 	treeTexture := rl.LoadTexture("images/tree.png")
 	defer rl.UnloadTexture(treeTexture)
