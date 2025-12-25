@@ -2,7 +2,6 @@
 
 A small arcade-style game written in **Go** using **raylib-go**, inspired by classic side-scrolling obstacle games like in Flappy Bird.\
 
----
 
 ## 🎮 Gameplay Overview
 
@@ -14,10 +13,7 @@ A small arcade-style game written in **Go** using **raylib-go**, inspired by cla
   * Trees
 * Each successfully passed obstacle increases your score
 * The game ends immediately upon collision
-* Top scores are saved locally using **SQLite**
-
----
-
+  
 ## 🕹️ Controls
 
 | Key | Action                |
@@ -27,17 +23,13 @@ A small arcade-style game written in **Go** using **raylib-go**, inspired by cla
 
 Gravity is always applied, so timing your movement is key.
 
----
 
 ## 🧱 Tech Info
 
-* Written in **Go**
+* Written in Go
 * Graphics and input handled via raylib-go
 * Persistent high scores using SQLite
 * Simple animation system for bird flapping
-* Game state managed through a dedicated `GameState` struct
-
----
 
 ## 🗃️ High Score System
 
@@ -45,22 +37,6 @@ Gravity is always applied, so timing your movement is key.
 * Each score entry is tagged with the date it was achieved
 * Displays the top 3 scores on game over
 * Automatically records the score once per run
-
----
-
-## 🚀 How to Run
-
-### Prerequisites
-
-* Go 1.21+
-* Raylib dependencies installed for your OS
-
-###💻 Dependencies
-
-```bash
-go get github.com/gen2brain/raylib-go/raylib
-go get github.com/glebarez/go-sqlite
----
 
 ## 📸 Screenshots
 
