@@ -39,7 +39,7 @@ Gravity is always applied, so timing your movement is key.
 * Automatically records the score once per run
 
 ## 📸 Screenshots
+<img width="802" height="632" alt="Screenshot 2026-01-06 215725" src="https://github.com/user-attachments/assets/82817393-8c79-458a-8947-dc8cf7193cdc" />
 
-*(Yet to be added)*
 
 Arrgh! Fair winds and high scores! 🏴‍☠️
