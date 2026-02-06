@@ -1,6 +1,6 @@
 # 🏴‍☠️ Sky Pirates!
 
-A small arcade-style game written in **Go** using **raylib-go**, inspired by classic side-scrolling obstacle games like in Flappy Bird.\
+A small arcade-style game written in **Go** using **raylib-go**, inspired by classic side-scrolling obstacle games like in Flappy Bird.
 
 
 ## 🎮 Gameplay Overview
